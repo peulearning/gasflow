@@ -7,23 +7,23 @@ import {
 }
 
 type Money struct {
-	conts int64
+	cents int64
 }
 
 var ErrNegativeMoney = errors.New("money : valor não pode ser negativo.")
 
 
-func NewMoney(conts int64) (Money, error){
-	if conts < 0 {
+func NewMoney(cents int64) (Money, error){
+	if cents < 0 {
 		return Money{}, ErrNegativeMoney
 	}
 
-	return Money(conts: conts), nil
+	return Money(cents: cents), nil
 }
 
 
-func MustMoney(conts int64) Money {
-	m, err := NewMoney(conts)
+func MustMoney(cents int64) Money {
+	m, err := NewMoney(cents)
 	if err != nil{
 		panic (err)
 	}
@@ -32,7 +32,7 @@ func MustMoney(conts int64) Money {
 }
 
 
-func (m Money) Conts() int64 { return m.cents }
+func (m Money) Cents() int64 { return m.cents }
 
 func (m Money) Add(other Money) Money {
 
