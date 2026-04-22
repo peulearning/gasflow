@@ -25,3 +25,33 @@ var transitions = map[Status][]Status{
 	StatusCancelled: {},
 	StatusRescheduled: {StatusApproved, StatusCancelled},
 }
+
+func CanTransitionTo(from, to Status) error {
+  allowed, ok := transitions[from]
+	if !ok {
+		return ErrInvalidTransition
+	}
+	for _, s := range allowed {
+		if s == to {
+			return nil
+		}
+	}
+	return ErrInvalidTransition
+}
+
+func isTerminal(s Status) bool {
+	return len(transitions[s]) == 0
+}
+
+func AllStatuses() []Status {
+	return []Status{
+		StatusReceived,
+		StatusApproved,
+		StatusSeparated,
+		StatusInRoute,
+		StatusDelivered,
+		StatusCancelled,
+		StatusRescheduled,
+	}
+}
+
