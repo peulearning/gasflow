@@ -68,3 +68,19 @@ func New(clientId, addressId, productId string, quantity int) (Order, error){
 	}, nil
 }
 
+func (o *Order) UpdateStatus(to Status, changedBy, reason string) (StatusHistory, error) {
+	if isTerminalStatus(o.Status) {
+		return StatusHistory{}, ErrOrderNoActive
+	}
+	if err := CanTransitionTo(o.Status, to); err != nil {
+		return StatusHistory{}, err
+	}
+
+	entry := StatusHistory{
+		OrderID: o.ID,
+		FromStatus: o.Status,
+		ToStatus: to,
+		ChangedBy: changedBy,
+		Reason: reason,
+		CreatedAt: time.Now().UTC(),
+	}
