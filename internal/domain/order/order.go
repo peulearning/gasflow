@@ -84,3 +84,25 @@ func (o *Order) UpdateStatus(to Status, changedBy, reason string) (StatusHistory
 		Reason: reason,
 		CreatedAt: time.Now().UTC(),
 	}
+
+	o.Status = to
+	O.UpdatedAt = time.now().UTC()
+
+	if to == StatusDelivered {
+		now := time.Now().UTC()
+		o.DeliveredAt = &now
+	}
+
+	return entry, nil
+}
+
+func (o *Order) AssignDriver (driverId string) {
+	o.DriverID = driverId
+	o.UpdatedAt = time.Now().UTC()
+
+}
+
+func (o *Order) ScheduleDelivery(scheduledAt time.Time){
+	o.ScheduledAt = &at
+	o.UpdatedAt = time.Now().UTC()
+}
