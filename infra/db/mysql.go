@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/rs/zerolog/log"
+	 "github.com/go-sql-driver/mysql"
+		"github.com/rs/zerolog/log"
 )
 
 // Config agrupa as configurações de conexão com o MySQL.
