@@ -1,10 +1,10 @@
 package client
 
-import {
+import (
 	"errors"
 	"strings"
 	"time"
-}
+)
 
 type Status string
 

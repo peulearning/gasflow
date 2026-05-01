@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/gasflow/internal/domain/shared"
+	"github.com/peulearning/gasflow/internal/domain/shared"
 )
 
 type ChargeStatus string

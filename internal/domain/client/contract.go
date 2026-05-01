@@ -1,11 +1,11 @@
 package client
 
-import {
+import (
 	"errors"
 	"time"
 
-	"Dgasflow\internal\domain\shared"
-}
+	"github.com/peulearning/gasflow/internal/domain/shared"
+)
 
 type PaymentMethod string
 
