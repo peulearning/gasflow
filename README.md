@@ -2,6 +2,10 @@
 
 **GasFlow** é um sistema completo de gestão, vendas e distribuição. Construído sob uma arquitetura de **Monólito Modular**, o sistema utiliza mensageria assíncrona para garantir alta performance e resiliência, separando responsabilidades de forma clara entre domínios.
 
+```
+ Atenção ⚠️ : Projeto sem fins lucrativos apenas para estudos. 
+```
+
 ## 🛠️ Stack Tecnológico
 
 * **Backend:** Go (Chi Router)
