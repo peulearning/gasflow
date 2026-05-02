@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gasflow/internal/domain/client"
+	"github.com/peulearning/gasflow/internal/domain/client"
 	"github.com/google/uuid"
 )
 

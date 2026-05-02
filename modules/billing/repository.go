@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gasflow/internal/domain/billing"
+	"github.com/peulearning/gasflow/internal/domain/billing"
 )
 
 var ErrChargeNotFound = errors.New("billing: cobrança não encontrada")
