@@ -4,7 +4,7 @@ import "errors"
 
 type Status string
 
-const {
+const (
 	StatusReceived Status = "RECEIVED"
 	StatusApproved Status = "APPROVED"
 	StatusSeparated Status = "SEPARATED"
@@ -12,7 +12,7 @@ const {
 	StatusDelivered Status = "DELIVERED"
 	StatusCancelled Status = "CANCELLED"
 	StatusRescheduled Status = "RESCHEDULED"
-}
+)
 
 var ErrInvalidTransition = errors.New("invalid status transition")
 

@@ -1,10 +1,10 @@
-packpage shared
+package shared
 
-import {
+import (
 
 	"errors"
 	"fmt"
-}
+)
 
 type Money struct {
 	cents int64
@@ -18,7 +18,7 @@ func NewMoney(cents int64) (Money, error){
 		return Money{}, ErrNegativeMoney
 	}
 
-	return Money(cents: cents), nil
+	return Money{cents: cents}, nil
 }
 
 

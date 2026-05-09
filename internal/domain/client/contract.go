@@ -9,13 +9,13 @@ import (
 
 type PaymentMethod string
 
-const {
+const (
 	PaymentCash	 PaymentMethod = "cash"
 	PaymentCredit PaymentMethod = "credit"
 	PaymentBilling PaymentMethod = "billing"
-}
+)
 
-Type Contract struct {
+type Contract struct{
 	ID string
 	ClientID string
 	ProductID string
@@ -25,10 +25,10 @@ Type Contract struct {
 	CreatedAt time.Time
 }
 
-var {
+var (
 	ErrContractExpired = errors.New("contract: contrato expirado")
 	ErrZeroPrice = errors.New("contract: preço não pode ser zero")
-}
+)
 
 func NewContract(id, clientID, productID string, price shared.Money, paymentMethod PaymentMethod, validUntil time.Time) (Contract, error) {
 	if priceCents <= 0 {

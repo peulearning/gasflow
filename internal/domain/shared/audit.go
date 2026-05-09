@@ -1,9 +1,9 @@
 	package shared
 
-	import {
+	import (
 		"encoding/json"
 		"time"
-	}
+	)
 
 	type Audit struct {
 		ID string `json:"id"`
