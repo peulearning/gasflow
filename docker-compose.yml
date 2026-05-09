@@ -1,0 +1,83 @@
+services:
+
+  # ── API Go ──────────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gasflow_api
+    ports:
+      - "8080:8080"
+    environment:
+      ENV: development
+      PORT: 8080
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: gasflow
+      DB_PASSWORD: gasflow
+      DB_NAME: gasflow
+      DB_ROOT_PASSWORD: rootpass
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      JWT_SECRET: troque-em-producao-use-256-bits!!
+      FRONTEND_URL: http://localhost:3000
+      DEFAULT_DEPOSIT_ID: dep-sp-001
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - gasflow
+
+  # ── MySQL ───────────────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: gasflow_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: gasflow
+      MYSQL_USER: gasflow
+      MYSQL_PASSWORD: gasflow
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./internal/infra/db/migrations:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpass"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - gasflow
+
+  # ── RabbitMQ ────────────────────────────────────────────────────────────────
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: gasflow_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - gasflow
+
+volumes:
+  mysql_data:
+  rabbitmq_data:
+
+networks:
+  gasflow:
+    driver: bridge
