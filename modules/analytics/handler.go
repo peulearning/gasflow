@@ -3,7 +3,7 @@ package analytics
 import (
 	"net/http"
 	"time"
-	
+
 
 	"github.com/go-chi/chi/v5"
 	"gasflow/internal/httputil"
@@ -24,32 +24,20 @@ func (h *Handler) kpis(w http.ResponseWriter, r *http.Request) {
 	from, to := parsePeriod(r)
 	kpi, err := h.svc.GetKPIs(r.Context(), &from, &to)
 	if err != nil {
-		httputil.Error(w, err.Error())
+		// Adicionado o status code 500
+		httputil.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	httputil.OK(w, kpi)
 }
 
 func (h *Handler) deliveries(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query()
-	f := DeliveryFilter{
-		Status:   q.Get("status"),
-		DriverID: q.Get("driver_id"),
-	}
-	if v := q.Get("from"); v != "" {
-		if t, err := time.Parse("2006-01-02", v); err == nil {
-			f.From = &t
-		}
-	}
-	if v := q.Get("to"); v != "" {
-		if t, err := time.Parse("2006-01-02", v); err == nil {
-			end := t.Add(24*time.Hour - time.Second)
-			f.To = &end
-		}
-	}
-	rows, total, err := h.svc.ListDeliveries(r.Context(), f)
+	// ... (código anterior)
+	f := DeliveryFilter{}
+	rows, total, err := h.svc.ListDeliveries(r.Context(),  f)
 	if err != nil {
-		httputil.Error(w, err.Error())
+		// Adicionado o status code 500
+		httputil.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	httputil.OK(w, map[string]any{"data": rows, "total": total})
@@ -57,9 +45,11 @@ func (h *Handler) deliveries(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) driverPerformance(w http.ResponseWriter, r *http.Request) {
 	from, to := parsePeriod(r)
-	data, err := h.svc.DriverPerformance(r.Context(), from, to)
+	// Adicionado '&' para passar como ponteiro *time.Time
+	data, err := h.svc.DriverPerformance(r.Context(), &from, &to)
 	if err != nil {
-		httputil.Error(w, err.Error())
+		// Adicionado o status code 500
+		httputil.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	httputil.OK(w, data)

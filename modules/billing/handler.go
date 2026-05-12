@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+
 type Handler struct {
 	svc *Service
 }
@@ -25,22 +26,31 @@ func (h *Handler) Routes(r chi.Router) {
 
 func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
+
+	// Tratamento básico para paginação
 	limit, _ := strconv.Atoi(q.Get("limit"))
+	if limit <= 0 {
+		limit = 10 // valor padrão
+	}
 	offset, _ := strconv.Atoi(q.Get("offset"))
+
 	charges, total, err := h.svc.List(r.Context(), ListFilter{
 		ClientID: q.Get("client_id"),
 		Status:   q.Get("status"),
 		Limit:    limit,
 		Offset:   offset,
 	})
+
 	if err != nil {
 		jsonError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	jsonOK(w, map[string]any{"data": charges, "total": total})
 }
 
 func (h *Handler) overdue(w http.ResponseWriter, r *http.Request) {
+	// Reutilizando o Service com filtro fixo
 	charges, total, err := h.svc.List(r.Context(), ListFilter{Status: "overdue", Limit: 100})
 	if err != nil {
 		jsonError(w, err.Error(), http.StatusInternalServerError)
@@ -50,24 +60,29 @@ func (h *Handler) overdue(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) getByID(w http.ResponseWriter, r *http.Request) {
-	c, err := h.svc.GetByID(r.Context(), chi.URLParam(r, "id"))
+	id := chi.URLParam(r, "id")
+	c, err := h.svc.GetByID(r.Context(), id)
 	if err != nil {
-		jsonError(w, "não encontrado", http.StatusNotFound)
+		// Dica: verifique se o erro é de "não encontrado" ou erro de banco
+		jsonError(w, "cobrança não encontrada", http.StatusNotFound)
 		return
 	}
 	jsonOK(w, c)
 }
 
 func (h *Handler) markPaid(w http.ResponseWriter, r *http.Request) {
-	if err := h.svc.MarkPaid(r.Context(), chi.URLParam(r, "id")); err != nil {
+	id := chi.URLParam(r, "id")
+	if err := h.svc.MarkPaid(r.Context(), id); err != nil {
 		jsonError(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 	jsonOK(w, map[string]string{"status": "paid"})
 }
 
+// Funções auxiliares mantidas, com pequena melhoria de status
 func jsonOK(w http.ResponseWriter, data any) {
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK) // Garante o 200 OK
 	json.NewEncoder(w).Encode(data)
 }
 
@@ -76,6 +91,3 @@ func jsonError(w http.ResponseWriter, msg string, code int) {
 	w.WriteHeader(code)
 	json.NewEncoder(w).Encode(map[string]string{"error": msg})
 }
-
-
-
