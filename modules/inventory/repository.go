@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gasflow/internal/domain/inventory"
+	"gasflow/internal/domain/inventory"
 )
 
 var ErrItemNotFound = errors.New("inventory: item não encontrado")

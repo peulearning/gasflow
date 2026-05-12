@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gasflow/internal/domain/order"
-	"github.com/gasflow/internal/infra/messaging"
+	"gasflow/internal/domain/order"
+	"gasflow/internal/infra/messaging"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )

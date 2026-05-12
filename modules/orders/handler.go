@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/gasflow/internal/infra/auth"
+	"gasflow/internal/infra/auth"
 )
 
 type Handler struct {

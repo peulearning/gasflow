@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/peulearning/gasflow/internal/domain/client"
+	"gasflow/internal/domain/client"
 )
 
 var ErrClientNotFound = errors.New("clients: não encontrado")

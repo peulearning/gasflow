@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/peulearning/gasflow/internal/domain/order"
+	"gasflow/internal/domain/order"
 )
 
 var ErrOrderNotFound = errors.New("orders: não encontrado")

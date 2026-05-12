@@ -7,12 +7,12 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	chimid "github.com/go-chi/chi/v5/middleware"
-	"github.com/peulearning/gasflow/api/internal/infra/auth"
-	analyticsH "github.com/peulearning/gasflow/api/internal/modules/analytics"
-	billingH "github.com/peulearning/gasflow/api/internal/modules/billing"
-	clientsH "github.com/peulearning/gasflow/api/internal/modules/clients"
-	inventoryH "github.com/peulearning/gasflow/api/internal/modules/inventory"
-	ordersH "github.com/peulearning/gasflow/api/internal/modules/orders"
+	"gasflow/infra/auth"
+	analyticsH "gasflow/modules/analytics"
+	billingH "gasflow/modules/billing"
+	clientsH "gasflow/modules/clients"
+	inventoryH "gasflow/modules/inventory"
+	ordersH "gasflow/modules/orders"
 	"golang.org/x/crypto/bcrypt"
 )
 

@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gasflow/internal/domain/inventory"
-	"github.com/gasflow/internal/infra/messaging"
+	"gasflow/internal/domain/inventory"
+	"gasflow/internal/infra/messaging"
 	"github.com/rs/zerolog/log"
 )
 

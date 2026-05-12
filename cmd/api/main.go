@@ -11,16 +11,16 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
-	"github.com/gasflow/api/internal/gateway"
-	"github.com/gasflow/api/internal/infra/auth"
-	"github.com/gasflow/api/internal/infra/db"
-	"github.com/gasflow/api/internal/infra/messaging"
+	"gasflow/gateway"
+	"gasflow/infra/auth"
+	"gasflow/infra/db"
+	"gasflow/infra/messaging"
 
-	analyticsM "github.com/gasflow/api/internal/modules/analytics"
-	billingM "github.com/gasflow/api/internal/modules/billing"
-	clientsM "github.com/gasflow/api/internal/modules/clients"
-	inventoryM "github.com/gasflow/api/internal/modules/inventory"
-	ordersM "github.com/gasflow/api/internal/modules/orders"
+	analyticsM "gasflow/modules/analytics"
+	billingM "gasflow/modules/billing"
+	clientsM "gasflow/modules/clients"
+	inventoryM "gasflow/modules/inventory"
+	ordersM "gasflow/modules/orders"
 )
 
 func main() {

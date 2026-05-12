@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/gasflow/api/internal/gateway"
+	"gasflow/gateway"
 )
 
 type Handler struct{ svc *Service }
