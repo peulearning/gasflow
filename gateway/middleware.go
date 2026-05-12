@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/go-chi/cors"
+	"gasflow/internal/httputil"
 	"github.com/rs/zerolog/log"
 )
 
@@ -28,7 +29,7 @@ func Recoverer(next http.Handler) http.Handler {
 		defer func() {
 			if rv := recover(); rv != nil {
 				log.Error().Interface("panic", rv).Str("path", r.URL.Path).Msg("panic recovered")
-				InternalError(w, "internal server error")
+				httputil.InternalError(w, "internal server error")
 			}
 		}()
 		next.ServeHTTP(w, r)

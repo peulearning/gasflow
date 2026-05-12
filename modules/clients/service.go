@@ -88,7 +88,6 @@ func (s *Service) AddAddress(ctx context.Context, in AddAddressInput) (client.Ad
 		ClientID:  in.ClientID,
 		Street:    in.Street,
 		City:      in.City,
-		State:     in.State,
 		Zipcode:   in.Zipcode,
 		Region:    in.Region,
 		IsPrimary: in.IsPrimary,

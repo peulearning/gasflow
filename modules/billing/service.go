@@ -7,6 +7,14 @@ import (
 type Service struct {
 }
 
+func (s *Service) List(context context.Context, filter ListFilter) (any, any, any) {
+	panic("unimplemented")
+}
+
+func (s *Service) GenerateCharge(ctx context.Context, d string, param3 string, amountCents int64) (any, any) {
+	panic("unimplemented")
+}
+
 func NewService() *Service {
 	return &Service{}
 }
@@ -35,4 +43,17 @@ func (s *Service) GetInvoiceByID(ctx context.Context, id string) (*Invoice, erro
 		ClientID: "client-001",
 		Amount:   100,
 	}, nil
+}
+
+
+func (s *Service) GetByID(id string) (*Invoice, error) {
+	return nil, nil
+}
+
+func (s *Service) List() (*Invoice, error) {
+	return nil, nil
+}
+
+func (s *Service) MarkPaid(id string) error {
+	return nil
 }

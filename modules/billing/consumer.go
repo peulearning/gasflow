@@ -66,7 +66,7 @@ func (c *Consumer) handleOrderDelivered(ctx context.Context, msg amqp.Delivery) 
 	amountCents := c.pricePerUnit * int64(evt.Quantity)
 	_, err := c.svc.GenerateCharge(ctx, evt.OrderID, evt.ClientID, amountCents)
 	if err != nil {
-		log.Error().Err(err).Str("order_id", evt.OrderID).Msg("billing.consumer: generate charge failed")
+		log.Error().Err(ErrChargeNotFound).Str("order_id", evt.OrderID).Msg("billing.consumer: generate charge failed")
 		msg.Nack(false, true)
 		return
 	}

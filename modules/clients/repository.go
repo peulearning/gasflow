@@ -109,7 +109,7 @@ func (r *Repository) CreateAddress(ctx context.Context, a client.Address) error 
 	const q = `
 		INSERT INTO addresses (id, client_id, street, city, state, zipcode, region, is_primary)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-	_, err := r.db.ExecContext(ctx, q, a.ID, a.ClientID, a.Street, a.City, a.State, a.Zipcode, a.Region, a.IsPrimary)
+	_, err := r.db.ExecContext(ctx, q, a.ID, a.ClientID, a.Street, a.City, a.Region, a.Zipcode, a.Region, a.IsPrimary)
 	return err
 }
 
@@ -123,7 +123,7 @@ func (r *Repository) ListAddresses(ctx context.Context, clientID string) ([]clie
 	var result []client.Address
 	for rows.Next() {
 		var a client.Address
-		rows.Scan(&a.ID, &a.ClientID, &a.Street, &a.City, &a.State, &a.Zipcode, &a.Region, &a.IsPrimary)
+		rows.Scan(&a.ID, &a.ClientID, &a.Street, &a.City, &a.Region, &a.Zipcode, &a.Region, &a.IsPrimary)
 		result = append(result, a)
 	}
 	return result, rows.Err()

@@ -10,47 +10,54 @@ import (
 type PaymentMethod string
 
 const (
-	PaymentCash	 PaymentMethod = "cash"
-	PaymentCredit PaymentMethod = "credit"
+	PaymentCash    PaymentMethod = "cash"
+	PaymentCredit  PaymentMethod = "credit"
 	PaymentBilling PaymentMethod = "billing"
 )
 
-type Contract struct{
-	ID string
-	ClientID string
-	ProductID string
-	Price shared.Money
-	PaymentMethod PaymentMethod
-	ValidUntil time.Time
-	CreatedAt time.Time
+type Contract struct {
+	ID             string
+	ClientID       string
+	ProductID      string
+	Price          shared.Money
+	PaymentMethod  PaymentMethod
+	ValidUntil     time.Time
+	CreatedAt      time.Time
 }
 
 var (
 	ErrContractExpired = errors.New("contract: contrato expirado")
-	ErrZeroPrice = errors.New("contract: preço não pode ser zero")
+	ErrZeroPrice       = errors.New("contract: preço não pode ser zero")
 )
 
-func NewContract(id, clientID, productID string, price shared.Money, paymentMethod PaymentMethod, validUntil time.Time) (Contract, error) {
-	if priceCents <= 0 {
+func NewContract(
+	id,
+	clientID,
+	productID string,
+	price shared.Money,
+	paymentMethod PaymentMethod,
+	validUntil time.Time,
+) (Contract, error) {
+
+	if price.Cents() <= 0 {
 		return Contract{}, ErrZeroPrice
 	}
-	price, err := shared.NewMoney(priceCents)
-	if err != nil {
-		return Contract{
-			ID: id,
-			ClientID: clientID,
-			ProductID: productID,
-			Price: price,
-			PaymentMethod: paymentMethod,
-			ValidUntil: validUntil,
-			CreatedAt: time.Now().UTC(),
-		}, nil
-	}
+
+	return Contract{
+		ID:            id,
+		ClientID:      clientID,
+		ProductID:     productID,
+		Price:         price,
+		PaymentMethod: paymentMethod,
+		ValidUntil:    validUntil,
+		CreatedAt:     time.Now().UTC(),
+	}, nil
 }
 
 func (c *Contract) IsValid() error {
-	if c.ValidUntil != nil && time.Now().UTC().(*c.ValidUntil) {
+	if time.Now().UTC().After(c.ValidUntil) {
 		return ErrContractExpired
 	}
-		return nil
+
+	return nil
 }

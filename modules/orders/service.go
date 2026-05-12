@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"gasflow/internal/domain/order"
-	"gasflow/internal/infra/messaging"
+	"gasflow/infra/messaging"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )

@@ -3,9 +3,10 @@ package analytics
 import (
 	"net/http"
 	"time"
+	
 
 	"github.com/go-chi/chi/v5"
-	"gasflow/gateway"
+	"gasflow/internal/httputil"
 )
 
 type Handler struct{ svc *Service }
@@ -21,12 +22,12 @@ func (h *Handler) Routes(r chi.Router) {
 
 func (h *Handler) kpis(w http.ResponseWriter, r *http.Request) {
 	from, to := parsePeriod(r)
-	kpi, err := h.svc.GetKPIs(r.Context(), from, to)
+	kpi, err := h.svc.GetKPIs(r.Context(), &from, &to)
 	if err != nil {
-		gateway.InternalError(w, err.Error())
+		httputil.Error(w, err.Error())
 		return
 	}
-	gateway.OK(w, kpi)
+	httputil.OK(w, kpi)
 }
 
 func (h *Handler) deliveries(w http.ResponseWriter, r *http.Request) {
@@ -48,29 +49,29 @@ func (h *Handler) deliveries(w http.ResponseWriter, r *http.Request) {
 	}
 	rows, total, err := h.svc.ListDeliveries(r.Context(), f)
 	if err != nil {
-		gateway.InternalError(w, err.Error())
+		httputil.Error(w, err.Error())
 		return
 	}
-	gateway.OK(w, map[string]any{"data": rows, "total": total})
+	httputil.OK(w, map[string]any{"data": rows, "total": total})
 }
 
 func (h *Handler) driverPerformance(w http.ResponseWriter, r *http.Request) {
 	from, to := parsePeriod(r)
 	data, err := h.svc.DriverPerformance(r.Context(), from, to)
 	if err != nil {
-		gateway.InternalError(w, err.Error())
+		httputil.Error(w, err.Error())
 		return
 	}
-	gateway.OK(w, data)
+	httputil.OK(w, data)
 }
 
 func (h *Handler) topClients(w http.ResponseWriter, r *http.Request) {
 	data, err := h.svc.TopClients(r.Context(), 10)
 	if err != nil {
-		gateway.InternalError(w, err.Error())
+		// httputil.Error(w, err.Error())
 		return
 	}
-	gateway.OK(w, data)
+	httputil.OK(w, data)
 }
 
 func parsePeriod(r *http.Request) (time.Time, time.Time) {

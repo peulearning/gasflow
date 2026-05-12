@@ -7,16 +7,18 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	chimid "github.com/go-chi/chi/v5/middleware"
+	"golang.org/x/crypto/bcrypt"
+
+	"gasflow/internal/httputil"
 	"gasflow/infra/auth"
 	analyticsH "gasflow/modules/analytics"
-	billingH "gasflow/modules/billing"
-	clientsH "gasflow/modules/clients"
+	billingH   "gasflow/modules/billing"
+	clientsH   "gasflow/modules/clients"
 	inventoryH "gasflow/modules/inventory"
-	ordersH "gasflow/modules/orders"
-	"golang.org/x/crypto/bcrypt"
+	ordersH    "gasflow/modules/orders"
 )
 
-// Handlers agrupa todos os handlers de módulos.
+// Handlers agrupa todos os handlers registrados no router.
 type Handlers struct {
 	Clients   *clientsH.Handler
 	Orders    *ordersH.Handler
@@ -24,54 +26,42 @@ type Handlers struct {
 	Billing   *billingH.Handler
 	Analytics *analyticsH.Handler
 	Auth      *auth.Service
-	DB        *sql.DB // necessário para o login handler
+	DB        *sql.DB
 }
 
-// New monta e retorna o router HTTP completo.
+// New constrói e retorna o router HTTP completo.
 func New(h Handlers, allowedOrigins []string) http.Handler {
 	r := chi.NewRouter()
 
-	// ── Middlewares globais ────────────────────────────────────────────────
 	r.Use(chimid.RequestID)
 	r.Use(chimid.RealIP)
 	r.Use(Recoverer)
 	r.Use(Logger)
 	r.Use(CORS(allowedOrigins))
 
-	// ── Health check (sem auth) ────────────────────────────────────────────
+	// Sem autenticação
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		OK(w, map[string]string{"status": "ok"})
+		httputil.OK(w, map[string]string{"status": "ok", "service": "gasflow"})
 	})
-
-	// ── Auth (sem autenticação) ────────────────────────────────────────────
 	r.Post("/api/auth/login", loginHandler(h.Auth, h.DB))
 
-	// ── Rotas protegidas por JWT ───────────────────────────────────────────
+	// Rotas protegidas
 	r.Group(func(r chi.Router) {
 		r.Use(h.Auth.Authenticate)
 
-		// Clientes — admin e operacional
 		r.Route("/api/clients", func(r chi.Router) {
 			h.Clients.Routes(r)
 		})
-
-		// Pedidos — admin e operacional
 		r.Route("/api/orders", func(r chi.Router) {
 			h.Orders.Routes(r)
 		})
-
-		// Estoque — admin e operacional
 		r.Route("/api/inventory", func(r chi.Router) {
 			h.Inventory.Routes(r)
 		})
-
-		// Cobranças — admin e financeiro apenas
 		r.Route("/api/charges", func(r chi.Router) {
 			r.Use(h.Auth.Authorize(auth.RoleAdmin, auth.RoleFinancial))
 			h.Billing.Routes(r)
 		})
-
-		// Dashboard — todos os roles autenticados
 		r.Route("/api/dashboard", func(r chi.Router) {
 			h.Analytics.Routes(r)
 		})
@@ -82,12 +72,12 @@ func New(h Handlers, allowedOrigins []string) http.Handler {
 
 // ── Login handler ─────────────────────────────────────────────────────────────
 
-type loginRequest struct {
+type loginReq struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-type loginResponse struct {
+type loginResp struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	UserID       string `json:"user_id"`
@@ -96,39 +86,41 @@ type loginResponse struct {
 
 func loginHandler(svc *auth.Service, db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req loginRequest
+		var req loginReq
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			BadRequest(w, "payload inválido")
+			httputil.BadRequest(w, "payload inválido")
 			return
 		}
 		if req.Email == "" || req.Password == "" {
-			BadRequest(w, "email e password são obrigatórios")
+			httputil.BadRequest(w, "email e password obrigatórios")
 			return
 		}
 
-		var userID, name, hash, role string
+		var userID, hash, role string
 		err := db.QueryRowContext(r.Context(),
-			`SELECT id, name, password, role FROM users WHERE email=? AND is_active=1`,
+			`SELECT id, password, role FROM users WHERE email=? AND is_active=1`,
 			req.Email,
-		).Scan(&userID, &name, &hash, &role)
+		).Scan(&userID, &hash, &role)
 		if err != nil {
-			Unauthorized(w, "credenciais inválidas")
+			// Tempo constante para evitar timing attack
+			bcrypt.CompareHashAndPassword([]byte("$2a$10$dummydummydummydummyduu"), []byte(req.Password))
+			httputil.Unauthorized(w, "credenciais inválidas")
 			return
 		}
 
 		if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(req.Password)); err != nil {
-			Unauthorized(w, "credenciais inválidas")
+			httputil.Unauthorized(w, "credenciais inválidas")
 			return
 		}
 
 		access, err := svc.GenerateAccessToken(userID, req.Email, auth.Role(role))
 		if err != nil {
-			InternalError(w, "erro ao gerar token")
+			httputil.InternalError(w, "erro ao gerar token")
 			return
 		}
 		refresh, _ := svc.GenerateRefreshToken(userID)
 
-		OK(w, loginResponse{
+		httputil.OK(w, loginResp{
 			AccessToken:  access,
 			RefreshToken: refresh,
 			UserID:       userID,

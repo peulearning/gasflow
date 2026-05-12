@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"gasflow/internal/domain/billing"
+	"gasflow/internal/domain/shared"
+
 )
 
 var ErrChargeNotFound = errors.New("billing: cobrança não encontrada")
@@ -95,7 +97,7 @@ func (r *Repository) List(ctx context.Context, f ListFilter) ([]billing.Charge, 
 		var amountCents int64
 		var status billing.ChargeStatus
 		rows.Scan(&c.ID, &c.OrderID, &c.ClientID, &amountCents, &status, &c.DueDate, &paidAt, &c.CreatedAt)
-		c.Amount, _ = billing.MoneyFromCents(amountCents)
+		c.Amount, _ = shared.NewMoney(amountCents)
 		c.Status = status
 		if paidAt.Valid {
 			c.PaidAt = &paidAt.Time
@@ -117,7 +119,7 @@ func scanCharge(row *sql.Row) (billing.Charge, error) {
 	if err != nil {
 		return billing.Charge{}, err
 	}
-	c.Amount, _ = billing.MoneyFromCents(amountCents)
+	c.Amount, _ = shared.NewMoney(amountCents)
 	c.Status = status
 	if paidAt.Valid {
 		c.PaidAt = &paidAt.Time

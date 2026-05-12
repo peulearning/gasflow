@@ -12,6 +12,10 @@ type Service struct {
 	repo *Repository
 }
 
+func (s *Service) TopClients(context context.Context, i int) (any, any) {
+	panic("unimplemented")
+}
+
 func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
 }

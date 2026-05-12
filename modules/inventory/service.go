@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"gasflow/internal/domain/inventory"
-	"gasflow/internal/infra/messaging"
+	"gasflow/infra/messaging"
 	"github.com/rs/zerolog/log"
 )
 

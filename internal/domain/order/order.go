@@ -93,6 +93,10 @@ func (o *Order) Transition(to Status, changedBy, reason string) (StatusHistory, 
 	return entry, nil
 }
 
+func IsTerminal(status Status) bool {
+	panic("unimplemented")
+}
+
 func (o *Order) AssignDriver(driverID string) {
 	o.DriverID = driverID
 	o.UpdatedAt = time.Now().UTC()
