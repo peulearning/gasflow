@@ -25,15 +25,18 @@ func Logger(next http.Handler) http.Handler {
 }
 
 func Recoverer(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		defer func() {
-			if rv := recover(); rv != nil {
-				log.Error().Interface("panic", rv).Str("path", r.URL.Path).Msg("panic recovered")
-				httputil.InternalError(w, "internal server error")
-			}
-		}()
-		next.ServeHTTP(w, r)
-	})
+  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    defer func() {
+      if rv := recover(); rv != nil {
+        log.Error().Interface("panic", rv).Str("path", r.URL.Path).Msg("panic recovered")
+
+        // ALTERAÇÃO AQUI:
+        // Use httputil.Error passando o status 500 explicitamente
+        httputil.Error(w, http.StatusInternalServerError, "internal server error")
+      }
+    }()
+    next.ServeHTTP(w, r)
+  })
 }
 
 func CORS(origins []string) func(http.Handler) http.Handler {

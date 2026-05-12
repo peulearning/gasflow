@@ -23,3 +23,8 @@ func Unauthorized(w http.ResponseWriter, msg string)  { Error(w, http.StatusUnau
 func Forbidden(w http.ResponseWriter, msg string)     { Error(w, http.StatusForbidden, msg) }
 func NotFound(w http.ResponseWriter, msg string)      { Error(w, http.StatusNotFound, msg) }
 func Unprocessable(w http.ResponseWriter, msg string) { Error(w, http.StatusUnprocessableEntity, msg) }
+
+
+func InternalError(w http.ResponseWriter, msg string) {
+    Error(w, http.StatusInternalServerError, msg)
+}

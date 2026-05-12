@@ -3,17 +3,24 @@ package billing
 import (
 	"context"
 	"errors"
+
+
+	"gasflow/infra/messaging"
 )
 
 // Definindo a struct que o Handler utiliza
 
 
 type Service struct {
-	// Aqui entrará seu repositório ou DB futuramente
+	repo *Repository
+	mq   *messaging.Client
 }
 
-func NewService() *Service {
-	return &Service{}
+func NewService(repo *Repository, mq *messaging.Client) *Service {
+	return &Service{
+		repo: repo,
+		mq:   mq,
+	}
 }
 
 type Invoice struct {
@@ -63,4 +70,9 @@ func (s *Service) CreateInvoice(ctx context.Context, invoice Invoice) error {
 func (s *Service) GenerateCharge(ctx context.Context, clientID string, description string, amountCents int64) (string, error) {
 	// Lógica para gerar cobrança
 	return "ch_123", nil
+}
+
+func (s *Service) RunOverdueJob(ctx context.Context) {
+    // TODO: Implementar lógica para buscar faturas vencidas no s.repo
+    // e atualizar o status para "overdue"
 }
