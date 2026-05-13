@@ -61,16 +61,17 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
+      RABBITMQ_ERLANG_COOKIE: "gasflow_secret_cookie"  # Adicionado os : e aspas por segurança
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
+    # volumes:
+    #   - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      test: ["CMD-SHELL", "nc -z localhost 5672 || exit 1"]
       interval: 10s
-      timeout: 5s
+      timeout: 10s
       retries: 10
-      start_period: 20s
+      start_period: 30s
     networks:
       - gasflow
 
