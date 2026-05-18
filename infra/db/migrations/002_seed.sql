@@ -49,3 +49,188 @@ INSERT IGNORE INTO addresses (id, client_id, street, city, state, zipcode, regio
 ('addr-003', 'cli-003', 'Rua XV de Nov., 200',  'São Paulo',       'SP', '01313-000', 'sul',    TRUE),
 ('addr-004', 'cli-004', 'Av. Atlântica, 1500',  'Rio de Janeiro',  'RJ', '22010-000', 'sul',    TRUE),
 ('addr-005', 'cli-005', 'Rua Augusta, 800',     'São Paulo',       'SP', '01305-000', 'centro', TRUE);
+
+
+-- ─── Veículos ────────────────────────────────────────────────────────────────
+
+INSERT IGNORE INTO vehicles (
+    id,
+    plate,
+    driver_id,
+    capacity_kg
+) VALUES
+('veh-001', 'ABC1D23', 'drv-001', 5000.00),
+('veh-002', 'XYZ9K88', 'drv-002', 4500.00),
+('veh-003', 'QWE7R65', 'drv-003', 6000.00);
+
+-- ─── Contratos ───────────────────────────────────────────────────────────────
+
+INSERT IGNORE INTO contracts (
+    id,
+    client_id,
+    product_id,
+    price_cents,
+    payment_method,
+    valid_until
+) VALUES
+('ctr-001', 'cli-001', 'prod-p13', 10500, 'billing', '2026-12-31'),
+('ctr-002', 'cli-002', 'prod-p45', 38000, 'cash', '2026-12-31'),
+('ctr-003', 'cli-003', 'prod-p20', 18000, 'credit', '2026-12-31');
+
+-- ─── Orders ──────────────────────────────────────────────────────────────────
+
+INSERT IGNORE INTO orders (
+    id,
+    client_id,
+    address_id,
+    product_id,
+    quantity,
+    status,
+    driver_id,
+    scheduled_at,
+    delivered_at,
+    notes
+) VALUES
+(
+    'ord-001',
+    'cli-001',
+    'addr-001',
+    'prod-p13',
+    10,
+    'delivered',
+    'drv-001',
+    NOW(),
+    NOW(),
+    'Entrega concluída'
+),
+(
+    'ord-002',
+    'cli-002',
+    'addr-002',
+    'prod-p45',
+    4,
+    'in_route',
+    'drv-002',
+    NOW(),
+    NULL,
+    'Saiu para entrega'
+),
+(
+    'ord-003',
+    'cli-003',
+    'addr-003',
+    'prod-p20',
+    7,
+    'approved',
+    'drv-003',
+    NOW(),
+    NULL,
+    'Pedido aprovado'
+);
+
+-- ─── Histórico de Status ─────────────────────────────────────────────────────
+
+INSERT IGNORE INTO order_status_history (
+    id,
+    order_id,
+    from_status,
+    to_status,
+    changed_by,
+    reason
+) VALUES
+(
+    'hist-001',
+    'ord-001',
+    'approved',
+    'delivered',
+    'u-admin-001',
+    'Entrega realizada'
+),
+(
+    'hist-002',
+    'ord-002',
+    'approved',
+    'in_route',
+    'u-op-001',
+    'Motorista saiu para entrega'
+);
+
+-- ─── Cobranças ───────────────────────────────────────────────────────────────
+
+INSERT IGNORE INTO charges (
+    id,
+    order_id,
+    client_id,
+    amount_cents,
+    status,
+    due_date,
+    paid_at
+) VALUES
+(
+    'chg-001',
+    'ord-001',
+    'cli-001',
+    105000,
+    'paid',
+    CURDATE(),
+    NOW()
+),
+(
+    'chg-002',
+    'ord-002',
+    'cli-002',
+    152000,
+    'pending',
+    CURDATE(),
+    NULL
+);
+
+-- ─── Analytics ───────────────────────────────────────────────────────────────
+
+INSERT IGNORE INTO analytics_daily (
+    reference_date,
+    deposit_id,
+    total_orders,
+    delivered,
+    delayed_count,
+    rescheduled_count,
+    volume_kg,
+    revenue_cents
+) VALUES
+(
+    CURDATE(),
+    'dep-sp-001',
+    30,
+    24,
+    2,
+    1,
+    540.50,
+    850000
+);
+
+-- ─── Audit Logs ──────────────────────────────────────────────────────────────
+
+INSERT IGNORE INTO audit_logs (
+    id,
+    entity,
+    entity_id,
+    action,
+    user_id,
+    payload
+) VALUES
+(
+    'audit-001',
+    'orders',
+    'ord-001',
+    'CREATE',
+    'u-admin-001',
+    JSON_OBJECT('status', 'delivered')
+),
+(
+    'audit-002',
+    'clients',
+    'cli-001',
+    'UPDATE',
+    'u-op-001',
+    JSON_OBJECT('field', 'phone')
+);

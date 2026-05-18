@@ -41,7 +41,7 @@ services:
       MYSQL_PASSWORD: gasflow
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./internal/infra/db/migrations:/docker-entrypoint-initdb.d:ro
+      - ./infra/db/migrations:/docker-entrypoint-initdb.d:ro
     ports:
       - "3306:3306"
     healthcheck:

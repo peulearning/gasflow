@@ -1,6 +1,10 @@
 -- 001_initial_schema.sql
--- GasFlow — schema inicial completo
+-- GasFlow — Schema Reorganizado (Correção de Dependências)
 
+-- Desabilita checagem para evitar erros de ordem de criação
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ─── Usuários ────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS users (
     id          CHAR(36) PRIMARY KEY,
     name        VARCHAR(200) NOT NULL,
@@ -14,8 +18,17 @@ CREATE TABLE IF NOT EXISTS users (
     INDEX idx_role  (role)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ─── Clientes ────────────────────────────────────────────────────────────────
+-- ─── Produtos (Movido para cima para permitir FKs) ───────────────────────────
+CREATE TABLE IF NOT EXISTS products (
+    id               CHAR(36) PRIMARY KEY,
+    name             VARCHAR(100) NOT NULL,
+    weight_kg        DECIMAL(6,2) NOT NULL,
+    unit_price_cents INT          NOT NULL,
+    is_active        BOOLEAN      NOT NULL DEFAULT TRUE,
+    created_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ─── Clientes e Endereços ────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS clients (
     id          CHAR(36) PRIMARY KEY,
     name        VARCHAR(200) NOT NULL,
@@ -43,6 +56,7 @@ CREATE TABLE IF NOT EXISTS addresses (
     INDEX idx_client (client_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ─── Contratos ───────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS contracts (
     id              CHAR(36) PRIMARY KEY,
     client_id       CHAR(36) NOT NULL,
@@ -51,22 +65,11 @@ CREATE TABLE IF NOT EXISTS contracts (
     payment_method  ENUM('cash','credit','billing') NOT NULL,
     valid_until     DATE,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (client_id) REFERENCES clients(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ─── Produtos ─────────────────────────────────────────────────────────────────
-
-CREATE TABLE IF NOT EXISTS products (
-    id               CHAR(36) PRIMARY KEY,
-    name             VARCHAR(100) NOT NULL,
-    weight_kg        DECIMAL(6,2) NOT NULL,
-    unit_price_cents INT          NOT NULL,
-    is_active        BOOLEAN      NOT NULL DEFAULT TRUE,
-    created_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+    FOREIGN KEY (client_id) REFERENCES clients(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ─── Motoristas e veículos ───────────────────────────────────────────────────
-
 CREATE TABLE IF NOT EXISTS drivers (
     id          CHAR(36) PRIMARY KEY,
     name        VARCHAR(200) NOT NULL,
@@ -88,7 +91,6 @@ CREATE TABLE IF NOT EXISTS vehicles (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ─── Pedidos ──────────────────────────────────────────────────────────────────
-
 CREATE TABLE IF NOT EXISTS orders (
     id           CHAR(36) PRIMARY KEY,
     client_id    CHAR(36) NOT NULL,
@@ -105,6 +107,7 @@ CREATE TABLE IF NOT EXISTS orders (
     FOREIGN KEY (client_id)  REFERENCES clients(id),
     FOREIGN KEY (address_id) REFERENCES addresses(id),
     FOREIGN KEY (product_id) REFERENCES products(id),
+    FOREIGN KEY (driver_id) REFERENCES drivers(id),
     INDEX idx_status_created  (status, created_at),
     INDEX idx_client          (client_id),
     INDEX idx_driver          (driver_id),
@@ -121,11 +124,11 @@ CREATE TABLE IF NOT EXISTS order_status_history (
     reason      VARCHAR(300),
     created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (changed_by) REFERENCES users(id),
     INDEX idx_order (order_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ─── Estoque ──────────────────────────────────────────────────────────────────
-
 CREATE TABLE IF NOT EXISTS inventory_deposits (
     id         CHAR(36) PRIMARY KEY,
     name       VARCHAR(100) NOT NULL,
@@ -147,7 +150,6 @@ CREATE TABLE IF NOT EXISTS inventory_items (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ─── Cobrança ─────────────────────────────────────────────────────────────────
-
 CREATE TABLE IF NOT EXISTS charges (
     id           CHAR(36) PRIMARY KEY,
     order_id     CHAR(36) NOT NULL,
@@ -163,24 +165,23 @@ CREATE TABLE IF NOT EXISTS charges (
     INDEX idx_client     (client_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ─── Analytics (read model) ───────────────────────────────────────────────────
-
+-- ─── Analytics ────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS analytics_daily (
-    date            DATE     NOT NULL,
-    deposit_id      CHAR(36) NOT NULL DEFAULT '',
-    total_orders    INT      NOT NULL DEFAULT 0,
-    delivered       INT      NOT NULL DEFAULT 0,
-    delayed         INT      NOT NULL DEFAULT 0,
-    rescheduled     INT      NOT NULL DEFAULT 0,
-    volume_kg       DECIMAL(10,2) NOT NULL DEFAULT 0,
-    revenue_cents   BIGINT   NOT NULL DEFAULT 0,
-    updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (date, deposit_id),
-    INDEX idx_date (date)
+    reference_date    DATE     NOT NULL,
+    deposit_id        CHAR(36) NOT NULL DEFAULT '',
+    total_orders      INT      NOT NULL DEFAULT 0,
+    delivered         INT      NOT NULL DEFAULT 0,
+    delayed_count     INT      NOT NULL DEFAULT 0,
+    rescheduled_count INT      NOT NULL DEFAULT 0,
+    volume_kg         DECIMAL(10,2) NOT NULL DEFAULT 0,
+    revenue_cents     BIGINT   NOT NULL DEFAULT 0,
+    updated_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (reference_date, deposit_id),
+    INDEX idx_date (reference_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ─── Auditoria ────────────────────────────────────────────────────────────────
-
 CREATE TABLE IF NOT EXISTS audit_logs (
     id         CHAR(36) PRIMARY KEY,
     entity     VARCHAR(50) NOT NULL,
@@ -192,3 +193,6 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     INDEX idx_entity  (entity, entity_id),
     INDEX idx_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Reabilita checagem de chaves estrangeiras
+SET FOREIGN_KEY_CHECKS = 1;
