@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { useAuthStore } from '@/store/auth'
-import { AppLayout }   from '@/components/layout/AppLayout'
+import { useAuthStore } from '../src/store/auth'
+import { AppLayout }   from './components/layout/AppLayout'
 import LoginPage       from '@/pages/login/LoginPage'
 import DashboardPage   from '@/pages/dashboard/DashboardPage'
 import OrdersPage      from '@/pages/orders/OrdersPage'
