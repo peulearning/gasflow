@@ -1,11 +1,11 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from '../src/store/auth'
 import { AppLayout }   from './components/layout/AppLayout'
-import LoginPage       from '@/pages/login/LoginPage'
-import DashboardPage   from '@/pages/dashboard/DashboardPage'
-import OrdersPage      from '@/pages/orders/OrdersPage'
-import InventoryPage   from '@/pages/inventory/InventoryPage'
-import ChargesPage     from '@/pages/charges/ChargesPage'
+import LoginPage       from '././pages/login/LoginPage'
+import DashboardPage   from './pages/dashboard/Dashboardpage'
+import OrdersPage      from '../src/pages/orders/OrdersPage'
+import InventoryPage   from '../src/pages/inventory/Inventorypage'
+import ChargesPage     from '../src/pages/charges/Chargespage'
 
 function Guard({ children }: { children: React.ReactNode }) {
   const isAuth = useAuthStore(s => s.isAuth)
