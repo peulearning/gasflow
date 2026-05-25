@@ -19,7 +19,7 @@ services:
       DB_ROOT_PASSWORD: rootpass
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
       JWT_SECRET: troque-em-producao-use-256-bits!!
-      FRONTEND_URL: http://localhost:3000
+      FRONTEND_URL: http://localhost:5173
       DEFAULT_DEPOSIT_ID: dep-sp-001
     depends_on:
       mysql:
