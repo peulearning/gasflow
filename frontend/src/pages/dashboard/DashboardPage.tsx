@@ -1,3 +1,4 @@
+import React from "react";
 import { useQuery } from '@tanstack/react-query'
 import { RefreshCw, Truck, TrendingUp, DollarSign, Warehouse, Package, Clock, AlertTriangle, Users } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area } from 'recharts'
