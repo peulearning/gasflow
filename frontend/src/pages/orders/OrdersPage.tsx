@@ -1,9 +1,9 @@
 import React from "react";
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { RefreshCw, ArrowRight, History, X, ChevronDown } from 'lucide-react'
+import { RefreshCw, ArrowRight, History, X } from 'lucide-react'
 import { ordersApi, type Order, type StatusHistory } from '../../api/endpoints'
-import { PageHeader, Card, StatusBadge, Button, Select, Skeleton, Empty } from '../../components/ui'
+import { PageHeader, Card, StatusBadge, Button, Skeleton, Empty } from '../../components/ui'
 import { fmt } from '../../lib/utils'
 
 const ALL_STATUSES = ['', 'received', 'approved', 'separated', 'in_route', 'delivered', 'cancelled', 'rescheduled']

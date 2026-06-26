@@ -36,9 +36,19 @@ export function StatusBadge({ status }: { status: string }) {
 }
 
 // ── Card ────────────────────────────────────────────────────────────────────
-export function Card({ children, className, glow }: {
-  children: React.ReactNode; className?: string; glow?: boolean
-}) {
+type CardProps = {
+  children: React.ReactNode
+  className?: string
+  glow?: boolean
+  style?: React.CSSProperties
+}
+
+export function Card({
+  children,
+  className,
+  glow,
+  style,
+}: CardProps) {
   return (
     <div
       className={cn('rounded-xl transition-all duration-200', className)}
@@ -46,14 +56,20 @@ export function Card({ children, className, glow }: {
         background: 'var(--surface-1)',
         border: '1px solid var(--border-subtle)',
         boxShadow: '0 1px 3px rgba(0,0,0,.4)',
+        ...style,
       }}
       onMouseEnter={e => {
-        if (glow) e.currentTarget.style.boxShadow = '0 0 0 1px rgba(245,158,11,.2), 0 8px 32px rgba(245,158,11,.07)'
-        else      e.currentTarget.style.borderColor = 'var(--border)'
+        if (glow)
+          e.currentTarget.style.boxShadow =
+            '0 0 0 1px rgba(245,158,11,.2), 0 8px 32px rgba(245,158,11,.07)'
+        else
+          e.currentTarget.style.borderColor = 'var(--border)'
       }}
       onMouseLeave={e => {
-        if (glow) e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,.4)'
-        else      e.currentTarget.style.borderColor = 'var(--border-subtle)'
+        if (glow)
+          e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,.4)'
+        else
+          e.currentTarget.style.borderColor = 'var(--border-subtle)'
       }}
     >
       {children}
@@ -222,8 +238,19 @@ export function KPICard({
 }
 
 // ── Skeleton ─────────────────────────────────────────────────────────────────
-export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn('skeleton', className)} />
+export function Skeleton({
+  className,
+  style,
+}: {
+  className?: string
+  style?: React.CSSProperties
+}) {
+  return (
+    <div
+      className={cn('skeleton', className)}
+      style={style}
+    />
+  )
 }
 
 // ── Empty state ──────────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { RefreshCw, AlertTriangle, PackagePlus, Warehouse, X, ChevronRight } from 'lucide-react'
 import { inventoryApi, type Deposit, type InventoryItem } from '../../api/endpoints'
-import { PageHeader, Card, Button, Input, Skeleton, Empty, ErrorBanner } from '../../components/ui'
+import { PageHeader, Button, Input, Skeleton, Empty, ErrorBanner } from '../../components/ui'
 import { fmt } from '../../lib/utils'
 
 // ── Schema recebimento ────────────────────────────────────────────────────────
@@ -33,7 +33,7 @@ export default function InventoryPage() {
   const { data: deposits = [], isLoading: depLoading, refetch } = useQuery({
     queryKey: ['deposits'],
     queryFn:  inventoryApi.deposits,
-    onSuccess: (d) => { if (!activeDeposit && d.length) setActiveDeposit(d[0]) },
+    onSuccess: (d: Deposit[]) => { if (!activeDeposit && d.length) setActiveDeposit(d[0]) },
   } as any)
 
   const { data: items = [], isLoading: itemsLoading } = useQuery({
@@ -49,7 +49,7 @@ export default function InventoryPage() {
 
   // ── Mutation recebimento ─────────────────────────────────────────────────
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<ReceiveForm>({
-    resolver: zodResolver(receiveSchema),
+    resolver: zodResolver(receiveSchema) as any,
     defaultValues: { product_id: 'prod-p13', quantity: 100 },
   })
 
@@ -300,7 +300,7 @@ export default function InventoryPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit(d => receive.mutate(d))} className="space-y-4">
+            <form onSubmit={handleSubmit((d: ReceiveForm) => receive.mutate(d))} className="space-y-4">
               {formError && <ErrorBanner message={formError} />}
 
               <div className="flex flex-col gap-1.5">
